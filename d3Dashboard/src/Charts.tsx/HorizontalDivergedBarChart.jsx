@@ -44,6 +44,30 @@ const HorizontalDivergedBarChart = () => {
             .rangeRound([space.marginTop, height - space.marginBottom])
             .padding(0.2);
 
+        const colors = d3.schemeRdBu[5]
+        svg.append("g")
+            .selectAll()
+            .data(data)
+            .join("rect")
+            .attr("fill", d => d.value > 0 ? colors[3] : colors[4])
+            .attr("x", d => { return x(Math.min(d.value, 0)) })
+            .attr("y", d => y(d.State))
+            .attr("width", d => Math.abs(x(d.value) - x(0)))
+            .attr("height", y.bandwidth)
+
+        const format = d3.format(valueType === "absolute" ? "+,d" : "0.1%")
+        svg.append("g")
+            .selectAll()
+            .data(data)
+            .join("text")
+            .attr("text-anchor", d => d.value > 0 ? "start" : "end")
+            .attr("x", d => x(d.value) + Math.sign(d.value) * 5)
+            .attr("y", d => y(d.State) + (y.bandwidth() / 2))
+            .attr("dy", "0.25em")
+            .attr("font-size", 12)
+            .attr("fill", "steelblue")
+            .text(d => format(d.value))
+
         const xTickFormat = valueType === "absolute" ? d3.formatPrefix("+0.1", 1e6) : d3.format("+0.1%")
         const xAxis = d3.axisTop(x).ticks(width / 50).tickFormat(xTickFormat)
         svg.append("g")
@@ -61,19 +85,10 @@ const HorizontalDivergedBarChart = () => {
         svg.append("g")
             .attr("transform", `translate(${x(0)}, 0)`)
             .call(yAxis)
+            .call(g => g.selectAll("text").attr("fill", (d, i) => data[i].value > 0 ? "steelblue" : colors[4]))
             .call(g => g.selectAll(".tick text").filter((d, i) => data[i].value < 0)
                 .attr("text-anchor", "start")
                 .attr("x", 7))
-
-        svg.append("g")
-            .selectAll()
-            .data(data)
-            .join("rect")
-            .attr("fill", "steelblue")
-            .attr("x", d => { return x(Math.min(d.value, 0)) })
-            .attr("y", d => y(d.State))
-            .attr("width", d => Math.abs(x(d.value) - x(0)))
-            .attr("height", y.bandwidth)
 
     }
 

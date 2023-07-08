@@ -5,10 +5,10 @@ import alphabet from "../assets/data/alphabetFrequency.json";
 const width = 800;
 const height = 600;
 const space = {
-  marginLeft: 100,
-  marginRight: 100,
-  marginTop: 100,
-  marginBottom: 100,
+  marginLeft: 80,
+  marginRight: 80,
+  marginTop: 80,
+  marginBottom: 80,
 };
 
 const BarCharts = () => {
