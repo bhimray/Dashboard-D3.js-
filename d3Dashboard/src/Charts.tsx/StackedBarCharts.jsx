@@ -27,17 +27,15 @@ const StackedBarCharts = () => {
       .stack()
       .keys(d3.union(data.map((d) => d.age)))
       .value(([d, D], key) => {
-        // console.log(d, D, key);
         return D.get(key).population;
       })(
         d3.index(
           data,
           (d) => d.state, // first group by state
           (d) => d.age // second group by age
-        ) // result [{state:{age{}}}]
+        )
+        // result [{state:{age{}}}]
       );
-
-    // console.log("x", d3.groupSort(data, D => -d3.sum(D, d => d.population), d => d.state))//sorting state in ascending or descending order
 
     const x = d3
       .scaleBand()
@@ -47,13 +45,28 @@ const StackedBarCharts = () => {
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(series, (d) => { console.log("series first unwrapped", d); return d3.max(d, d => { console.log("d unwrapped", d); return d[1] }) })])
+      .domain([0, d3.max(series, (d) => { return d3.max(d, d => { return d[1] }) })])
       .rangeRound([height - space.marginBottom, space.marginTop]);
 
     const color = d3.scaleOrdinal()
       .domain(series.map(d => d.key))
       .range(d3.schemeSpectral[series.length])
       .unknown("#ccc");
+
+    const rect = svg.append("g")
+      .attr("fill", "steelblue")
+      .selectAll()
+      .data(series)
+      .join("g")
+      .attr("fill", d => color(d.key))
+      .selectAll("rect")
+      .data(D => D)
+      .join("rect")
+      .attr("x", d => x(d.data[0]))
+      .attr("y", d => y(d[1]))
+      .attr("width", d => x.bandwidth())
+      .attr("height", d => y(d[0]) - y(d[1]))
+
 
     const xAxis = d3.axisBottom(x);
     svg
@@ -69,7 +82,7 @@ const StackedBarCharts = () => {
       .attr("transform", `translate(${space.marginLeft}, 0)`)
       .call(yAxis);
 
-    console.log("series", series);
+    // console.log("series", series);
   };
 
   useEffect(() => {
